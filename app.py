@@ -7,7 +7,7 @@ from tensorflow.keras.models import load_model
 st.title("Plant Disease Classifier")
 st.write("Upload a plant leaf image and the model will predict the disease.")
 
-# Path to your saved model folder
+# Path
 MODEL_PATH = 'models/plant_disease_model'
 
 # PlantVillage classes
@@ -25,7 +25,7 @@ class_names = [
     'Tomato___Target_Spot', 'Tomato___Tomato_mosaic_virus', 'Tomato___Tomato_Yellow_Leaf_Curl_Virus'
 ]
 
-# Load the model once
+# Load the model 
 @st.cache_resource
 def load_saved_model(path):
     if os.path.exists(path):
@@ -44,13 +44,20 @@ if uploaded_file and model is not None:
     img_array = np.expand_dims(img_array, axis=0)
 
     preds = model.predict(img_array)
-    pred_class = class_names[np.argmax(preds)]
+    pred_index = np.argmax(preds)
+    pred_class = class_names[pred_index]
     confidence = np.max(preds) * 100
 
-    st.image(image, use_column_width=True)
+    # healthy or diseased
+    status = "Healthy" if "healthy" in pred_class.lower() else "Diseased"
 
-    if confidence < 50:
-        st.warning("Model is unsure — the leaf may not belong to any known class.")
-    else:
-        st.success(f"Predicted: {pred_class} ({confidence:.2f}%)")
 
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.image(image, caption="Uploaded Leaf", use_column_width=True)
+    with col2:
+        st.subheader(f"Status: {status}")
+        st.write(f"Class: {pred_class}")
+        st.write(f"Confidence: {confidence:.2f}%")
+        if confidence < 70:
+            st.warning("Model is unsure — the leaf may not belong to any known class.")
