@@ -50,13 +50,17 @@ if uploaded_file and model is not None:
 
     # healthy or diseased
     status = "Healthy" if "healthy" in pred_class.lower() else "Diseased"
+    status_color = "green" if status == "Healthy" else "red"
 
 
     col1, col2 = st.columns([1, 2])
     with col1:
         st.image(image, caption="Uploaded Leaf", use_column_width=True)
     with col2:
-        st.subheader(f"Status: {status}")
+        st.markdown(
+        f"<span style='font-size:28px; font-weight:bold;'>Status: <span style='color:{status_color};'>{status}</span></span>",
+        unsafe_allow_html=True
+    )
         st.write(f"Class: {pred_class}")
         st.write(f"Confidence: {confidence:.2f}%")
         if confidence < 70:
